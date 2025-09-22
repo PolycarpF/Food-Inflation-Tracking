@@ -66,6 +66,26 @@
   }
 )
 
+(define-private (accumulate-stats (iter uint) (state {sum: uint, sumsq: uint, count: uint, food-type: (string-ascii 32), region: (string-ascii 32), start-period: uint}))
+  (let (
+    (period (- (get start-period state) iter))
+    (avg (map-get? regional-averages { region: (get region state), food-type: (get food-type state), period: period }))
+  )
+    (match avg
+      data
+      (let (
+        (price (get average-price data))
+        (new-sum (+ (get sum state) price))
+        (new-sumsq (+ (get sumsq state) (* price price)))
+        (new-count (+ (get count state) u1))
+      )
+        {sum: new-sum, sumsq: new-sumsq, count: new-count, food-type: (get food-type state), region: (get region state), start-period: (get start-period state)}
+      )
+      state
+    )
+  )
+)
+
 ;; Read-only functions
 (define-read-only (get-vendor (vendor-id uint))
   (map-get? vendors { vendor-id: vendor-id })
@@ -111,6 +131,26 @@
           )
         )
         (err ERR_NO_DATA)
+      )
+      (err ERR_NO_DATA)
+    )
+  )
+)
+
+(define-read-only (calculate-price-volatility (food-type (string-ascii 32)) (region (string-ascii 32)) (periods uint))
+  (let (
+    (current-period (/ stacks-block-height u144))
+    (initial-state {sum: u0, sumsq: u0, count: u0, food-type: food-type, region: region, start-period: current-period})
+    (stats (fold accumulate-stats (list u1 u2 u3 u4 u5 u6 u7 u8 u9 u10) initial-state))
+  )
+    (if (>= (get count stats) periods)
+      (let (
+        (sum (get sum stats))
+        (sumsq (get sumsq stats))
+        (count (get count stats))
+        (variance (/ (* (- (* sumsq count) (* sum sum)) u10000) (* count count)))
+      )
+        (ok variance)
       )
       (err ERR_NO_DATA)
     )
@@ -327,6 +367,7 @@
     false
   )
 )
+
 
 ;; Public query functions
 (define-public (get-latest-prices (food-type (string-ascii 32)) (region (string-ascii 32)))

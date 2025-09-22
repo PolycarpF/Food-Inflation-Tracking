@@ -1,5 +1,3 @@
-## 📋 Overview
-
 A blockchain-based real-time food price oracle that helps developing nations track food inflation by aggregating market vendor data. This smart contract enables transparent, trustless price tracking for essential food commodities.
 
 ## 🎯 Problem Statement
@@ -24,6 +22,7 @@ Decentralized food price oracle that:
 - 📈 Inflation rate calculations
 - 🌍 Regional price comparisons
 - 🚨 Price alert system
+- 📊 Price volatility calculations
 
 ### Supported Food Types
 - 🍚 Rice
@@ -84,19 +83,25 @@ Decentralized food price oracle that:
 ```
 *Alert threshold: 1000 = 10% inflation*
 
+#### 8. Calculate Price Volatility
+```clarity
+(contract-call? .Food-Inflation-Tracking calculate-price-volatility "rice" "north" u5)
+```
+*Calculates price volatility index over the last 5 periods*
+
 ### For Administrators
 
-#### 8. Validate Price Submissions
+#### 9. Validate Price Submissions
 ```clarity
 (contract-call? .Food-Inflation-Tracking validate-price u1)
 ```
 
-#### 9. Deactivate Vendor
+#### 10. Deactivate Vendor
 ```clarity
 (contract-call? .Food-Inflation-Tracking deactivate-vendor u1)
 ```
 
-#### 10. Emergency Price Update
+#### 11. Emergency Price Update
 ```clarity
 (contract-call? .Food-Inflation-Tracking emergency-price-update "rice" "north" u3000)
 ```
@@ -121,6 +126,7 @@ Decentralized food price oracle that:
 - Min/max price tracking
 - Sample counts for accuracy
 - Inflation rate calculations
+- Price volatility index calculations
 
 ## 🔒 Security Features
 
@@ -155,6 +161,7 @@ This smart contract enables:
 - 👨‍🌾 Better farmer market insights
 - 🌍 Cross-regional price transparency
 - 🚨 Early inflation warning systems
+- 📊 Advanced market volatility analysis
 
 ## 🤝 Contributing
 
