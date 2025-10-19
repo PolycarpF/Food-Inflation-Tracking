@@ -558,6 +558,56 @@
 )
 
 ;; Initialization
+(define-public (bulk-submit-prices (prices (list 10 {food-type: (string-ascii 32), price-per-kg: uint, region: (string-ascii 32)})))
+  (let (
+    (caller tx-sender)
+    (vendor-data (get-vendor-by-address caller))
+  )
+    (asserts! (is-some vendor-data) ERR_INVALID_VENDOR)
+    (let (
+      (vendor-info (unwrap! vendor-data ERR_INVALID_VENDOR))
+    )
+      (asserts! (get active vendor-info) ERR_INVALID_VENDOR)
+      (fold bulk-submit-helper prices {success: true, vendor-id: (get vendor-id (unwrap! (map-get? vendor-addresses {address: caller}) ERR_INVALID_VENDOR))})
+      (ok true)
+    )
+  )
+)
+
+(define-private (bulk-submit-helper (price-data {food-type: (string-ascii 32), price-per-kg: uint, region: (string-ascii 32)}) (state {success: bool, vendor-id: uint}))
+  (if (get success state)
+    (let (
+      (food-type (get food-type price-data))
+      (price-per-kg (get price-per-kg price-data))
+      (region (get region price-data))
+      (price-id (var-get next-price-id))
+      (current-time stacks-block-height)
+    )
+      (if (and (is-valid-food-type food-type) (is-valid-region region) (> price-per-kg u0))
+        (begin
+          (map-set food-prices
+            {price-id: price-id}
+            {
+              food-type: food-type,
+              price-per-kg: price-per-kg,
+              vendor-id: (get vendor-id state),
+              region: region,
+              timestamp: current-time,
+              validated: true
+            }
+          )
+          (update-price-averages food-type region price-per-kg)
+          (update-vendor-reputation (get vendor-id state))
+          (var-set next-price-id (+ price-id u1))
+          {success: true, vendor-id: (get vendor-id state)}
+        )
+        {success: false, vendor-id: (get vendor-id state)}
+      )
+    )
+    state
+  )
+)
+
 (define-public (initialize-contract)
   (begin
     (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_UNAUTHORIZED)

@@ -17,6 +17,7 @@ Decentralized food price oracle that:
 ### Core Functionality
 - ✅ Vendor registration and management
 - 📥 Price submission by verified vendors
+- 📦 Bulk price submission for multiple food types
 - 📊 Real-time price aggregation
 - 🔍 Price history tracking
 - 📈 Inflation rate calculations
@@ -54,6 +55,12 @@ Decentralized food price oracle that:
 (contract-call? .Food-Inflation-Tracking submit-price "rice" u2500 "north")
 ```
 *Price should be in smallest currency unit per kg (e.g., 2500 = 25.00 in local currency)*
+
+#### 2b. Submit Bulk Price Data
+```clarity
+(contract-call? .Food-Inflation-Tracking bulk-submit-prices (list {food-type: "rice", price-per-kg: u2500, region: "north"} {food-type: "maize", price-per-kg: u1800, region: "north"}))
+```
+*Submit prices for multiple food types in a single transaction to reduce costs*
 
 ### For Data Consumers
 
