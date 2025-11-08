@@ -96,6 +96,12 @@ Decentralized food price oracle that:
 ```
 *Calculates price volatility index over the last 5 periods*
 
+#### 9. Get Price Submission Count by Range
+```clarity
+(contract-call? .Food-Inflation-Tracking get-price-submission-count-by-range "rice" "north" u1000 u2000)
+```
+*Returns the number of price submissions for a specific food type and region within a block height range*
+
 ### For Administrators
 
 #### 9. Validate Price Submissions
@@ -169,6 +175,8 @@ This smart contract enables:
 - 🌍 Cross-regional price transparency
 - 🚨 Early inflation warning systems
 - 📊 Advanced market volatility analysis
+- 📈 Historical price submission analytics
+- 📈 Historical price submission analytics
 
 ## 🤝 Contributing
 

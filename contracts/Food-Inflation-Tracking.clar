@@ -608,6 +608,48 @@
   )
 )
 
+(define-read-only (get-price-submission-count-by-range (food-type (string-ascii 32)) (region (string-ascii 32)) (start-block uint) (end-block uint))
+  (let (
+    (max-price-id (var-get next-price-id))
+  )
+    (ok (get count (fold count-prices-in-range
+      (list u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 u14 u15 u16 u17 u18 u19 u20 u21 u22 u23 u24 u25 u26 u27 u28 u29 u30 u31 u32 u33 u34 u35 u36 u37 u38 u39 u40 u41 u42 u43 u44 u45 u46 u47 u48 u49 u50)
+      { count: u0, current-id: u1, max-id: max-price-id, food-type: food-type, region: region, start-block: start-block, end-block: end-block }
+    )))
+  )
+)
+
+(define-private (count-prices-in-range (iter uint) (state { count: uint, current-id: uint, max-id: uint, food-type: (string-ascii 32), region: (string-ascii 32), start-block: uint, end-block: uint }))
+  (let (
+    (current-id (get current-id state))
+    (max-id (get max-id state))
+    (food-type-filter (get food-type state))
+    (region-filter (get region state))
+    (start-block-filter (get start-block state))
+    (end-block-filter (get end-block state))
+    (current-count (get count state))
+  )
+    (if (< current-id max-id)
+      (let (
+        (price-data (map-get? food-prices { price-id: current-id }))
+      )
+        (match price-data
+          data
+          (if (and (is-eq (get food-type data) food-type-filter)
+                   (is-eq (get region data) region-filter)
+                   (>= (get timestamp data) start-block-filter)
+                   (<= (get timestamp data) end-block-filter))
+            { count: (+ current-count u1), current-id: (+ current-id u1), max-id: max-id, food-type: food-type-filter, region: region-filter, start-block: start-block-filter, end-block: end-block-filter }
+            { count: current-count, current-id: (+ current-id u1), max-id: max-id, food-type: food-type-filter, region: region-filter, start-block: start-block-filter, end-block: end-block-filter }
+          )
+          { count: current-count, current-id: (+ current-id u1), max-id: max-id, food-type: food-type-filter, region: region-filter, start-block: start-block-filter, end-block: end-block-filter }
+        )
+      )
+      state
+    )
+  )
+)
+
 (define-public (initialize-contract)
   (begin
     (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_UNAUTHORIZED)
